@@ -10,6 +10,9 @@ packages = [{include = "api_mygeoloc"}]
 python = "^3.11"
 alembic = "^1.11.1"
 psycopg2 = "^2.9.6"
+flask = "^2.3.2"
+flask-login = "^0.6.2"
+uuid = "^1.30"
 
 
 [build-system]
