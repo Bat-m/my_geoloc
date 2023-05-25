@@ -1,35 +1,58 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-import sqlalchemy as sa
-from flask_login import LoginManager, login_user, login_required, logout_user, UserMixin
-from alembic.config import Config
 
-# Lire l'URL de la base de données depuis le fichier alembic.ini
-alembic_config = Config('alembic.ini')
-database_url = alembic_config.get_section_option('alembic', 'sqlalchemy.url')
+from api_mygeoloc.db import session
+from api_mygeoloc.models import User
+import flask, flask_login
 
-Base = declarative_base()
-# Créer un moteur SQLAlchemy
-engine = create_engine(database_url)
+from .auth import auth as auth_blueprint
+from .main import main as main_blueprint
+from dotenv import load_dotenv
+import os
 
-# Créer une classe Session pour gérer les requêtes
-Session = sessionmaker(bind=engine)
-session = Session()
+# Charger les variables d'environnement à partir du fichier .env
+load_dotenv()
 
-# Utiliser la session pour effectuer des opérations sur la base de données
-# par exemple, exécuter des requêtes, ajouter ou mettre à jour des enregistrements, etc.
-class User(Base):
-    __tablename__ = 'user'
+# Accéder à la valeur d'une variable d'environnement
+secret_key = os.getenv('SECRET_KEY')
 
-    id = sa.Column(sa.UUID(), primary_key=True)
-    username = sa.Column(sa.String(50))
-    password = sa.Column(sa.String(100))
+app = flask.Flask(__name__)
+app.secret_key = secret_key 
+login_manager = flask_login.LoginManager()
 
-   
+login_manager.init_app(app)
+
 # Exemple d'utilisation : obtenir tous les utilisateurs de la table "users"
+
 users = session.query(User).all()
 for user in users:
         print(f"User ID: {user.id}, Username: {user.username}")
 # N'oubliez pas de fermer la session après utilisation
-session.close()
+#session.close()
+
+@login_manager.user_loader
+def user_loader(email):
+    if email not in users:
+        return
+
+    user = User()
+    user.id = email
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+    email = request.form.get('email')
+    if email not in users:
+        return
+
+    user = User()
+    user.id = email
+    return user
+
+# blueprint for auth routes in our app
+app.register_blueprint(auth_blueprint)
+
+# blueprint for non-auth parts of app
+app.register_blueprint(main_blueprint)
+
+# run app
+app.run(debug=True)
