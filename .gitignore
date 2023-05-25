@@ -1,0 +1,9 @@
+
+# Pants workspace files
+/.pants.*
+/dist/
+/.pids
+temp.txt
+BUILD
+BUILDtemp
+.env
