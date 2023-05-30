@@ -17,7 +17,7 @@ secret_key = os.getenv('SECRET_KEY')
 app = flask.Flask(__name__)
 app.secret_key = secret_key 
 login_manager = flask_login.LoginManager()
-
+login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
 # Exemple d'utilisation : obtenir tous les utilisateurs de la table "users"
