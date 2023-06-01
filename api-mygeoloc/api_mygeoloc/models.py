@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, relationship
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import text
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 Base = declarative_base()
 
 class User(UserMixin,Base):
@@ -24,6 +24,8 @@ class User(UserMixin,Base):
             'verify_password':self.verify_password
         }
     
+    def generate_password(pwd):
+            return generate_password_hash( pwd,  method='scrypt')
 
     def verify_password(self, pwd):
             return check_password_hash(self.password, pwd)

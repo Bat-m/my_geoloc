@@ -28,15 +28,16 @@ for user in users:
 # N'oubliez pas de fermer la session après utilisation
 #session.close()
 
+def check_user(email):
+    user=session.query(User).filter_by(email=email).first()
+    if user:  
+        return user
+    else:
+        return None
+
 @login_manager.user_loader
 def user_loader(email):
-    if email not in users:
-        return
-
-    user = User()
-    user.id = email
-    return user
-
+    return check_user(email)
 
 @login_manager.request_loader
 def request_loader(request):
