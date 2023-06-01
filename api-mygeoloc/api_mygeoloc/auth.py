@@ -17,22 +17,21 @@ def login():
         return render_template('login.html')
     #session_login=initialize_session()
     users = session.query(User).all()
-    user_dicts = [user.to_dict() for user in users]
-    print('user_dicts: ',user_dicts)
-    
+    api_key = str(flask.request.headers.get('Cookie'))
+    print('api_key: ',api_key.split("session=",1)[1])
     for user in users:
-        if user.email==flask.request.form['email'] and flask.request.form['password'] == user.password:
-            user = User()
-            user.id = user.email
-            flask_login.login_user(user)
-            return flask.redirect(flask.url_for('auth.protected'))
+        if user.email==flask.request.form['email'] and user.verify_password(flask.request.form['password']):
+            connected_user = User()
+            connected_user.id = user.email
+            flask_login.login_user(connected_user, remember=True)
+            return redirect(url_for('auth.protected'))
 
     return 'Bad login'
 
-@auth.route('/protected')
+@auth.route('/protected', methods=['GET'])
 @flask_login.login_required
 def protected():
-    return 'Logged in as: ' + flask_login.current_user.id
+    return 'Logged in as: ' + flask_login.current_user.email
 
 @auth.route('/signup')
 def signup():
@@ -51,7 +50,7 @@ def signup_post():
     if user: 
         return redirect(url_for('auth.login'))
 
-    new_user = User(username=username, password=generate_password_hash(password, method='scrypt'),email=email)
+    new_user = User(username=username, password=User.generate_password(password),email=email)
     
     session.add(new_user)
     session.commit()

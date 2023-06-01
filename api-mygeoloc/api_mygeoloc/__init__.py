@@ -17,7 +17,7 @@ secret_key = os.getenv('SECRET_KEY')
 app = flask.Flask(__name__)
 app.secret_key = secret_key 
 login_manager = flask_login.LoginManager()
-
+login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
 # Exemple d'utilisation : obtenir tous les utilisateurs de la table "users"
@@ -28,15 +28,16 @@ for user in users:
 # N'oubliez pas de fermer la session après utilisation
 #session.close()
 
+def check_user(email):
+    user=session.query(User).filter_by(email=email).first()
+    if user:  
+        return user
+    else:
+        return None
+
 @login_manager.user_loader
 def user_loader(email):
-    if email not in users:
-        return
-
-    user = User()
-    user.id = email
-    return user
-
+    return check_user(email)
 
 @login_manager.request_loader
 def request_loader(request):
