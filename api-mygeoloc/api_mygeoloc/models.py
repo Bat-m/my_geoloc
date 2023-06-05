@@ -29,3 +29,10 @@ class User(UserMixin,Base):
 
     def verify_password(self, pwd):
             return check_password_hash(self.password, pwd)
+    
+class User_Session(UserMixin,Base):
+    __tablename__ = 'user_session'
+
+    id = sa.Column(UUID(as_uuid=True), server_default=text('gen_random_uuid()'), primary_key=True)
+    user_id = sa.Column(sa.UUID(), sa.ForeignKey('users.id'))
+    session_token = sa.Column(sa.String(length=255))
