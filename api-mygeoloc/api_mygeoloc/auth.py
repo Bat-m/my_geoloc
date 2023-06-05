@@ -1,11 +1,11 @@
 
 
 from api_mygeoloc.db import session
-from api_mygeoloc.models import User
+from api_mygeoloc.models import User,User_Session
 from flask import Blueprint, render_template, redirect, url_for
 import flask, flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from sqlalchemy import text,insert
 
 # Create a session factory
 
@@ -31,6 +31,10 @@ def login():
 @auth.route('/protected', methods=['GET'])
 @flask_login.login_required
 def protected():
+    api_key = str(flask.request.headers.get('Cookie'))
+    #stmt=insert(User).values(user_id=flask_login.current_user.id,session_token=api_key.split("session=",1)[1])
+    session.execute(insert(User_Session),{"user_id":flask_login.current_user.id,"session_token":api_key.split("session=",1)[1]})
+    session.commit()
     return 'Logged in as: ' + flask_login.current_user.email
 
 @auth.route('/signup')

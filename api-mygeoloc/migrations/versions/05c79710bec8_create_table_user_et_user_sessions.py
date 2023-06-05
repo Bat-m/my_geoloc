@@ -42,8 +42,8 @@ def upgrade():
     # Création de la table UserSession
     op.create_table(
         'user_session',
-        sa.Column('id', sa.UUID(), primary_key=True,default=str(uuid.uuid4())),
-        sa.Column('user_id', sa.UUID(), sa.ForeignKey('users.id'), nullable=False,default=str(uuid.uuid4())),
+        sa.Column('id', sa.UUID(), primary_key=True,default=str(uuid.uuid4()), server_default=sa.text('gen_random_uuid()')),
+        sa.Column('user_id', sa.UUID(), sa.ForeignKey('users.id'), nullable=False, default=str(uuid.uuid4())),
         sa.Column('session_token', sa.String(length=255), nullable=False),
     )
 
