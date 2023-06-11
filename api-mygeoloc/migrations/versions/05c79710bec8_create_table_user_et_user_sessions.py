@@ -44,7 +44,7 @@ def upgrade():
         'user_session',
         sa.Column('id', sa.UUID(), primary_key=True,default=str(uuid.uuid4()), server_default=sa.text('gen_random_uuid()')),
         sa.Column('user_id', sa.UUID(), sa.ForeignKey('users.id'), nullable=False, default=str(uuid.uuid4())),
-        sa.Column('session_token', sa.String(length=255), nullable=False),
+        sa.Column('session_token', sa.String, nullable=False),
     )
 
 

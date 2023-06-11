@@ -14,6 +14,8 @@ flask = "^2.3.2"
 flask-login = "^0.6.2"
 uuid = "^1.30"
 python-dotenv = "^1.0.0"
+authlib = "^1.2.0"
+requests = "^2.31.0"
 
 
 [build-system]
